@@ -111,12 +111,20 @@ import AnalyticsEvents
         let service = AnalyticsService(session: session)
         self.service = service
         
+        // Gather any tracked user properties into an identity event.
+        var identityEvent: AnalyticsEvent.Identity?
+        if let userId = session.credentials.userId,
+           let userSession = UserSessionsService.shared.userSession(withUserId: userId),
+           let useCase = userSession.properties.useCase {
+            identityEvent = AnalyticsEvent.Identity(ftueUseCaseSelection: useCase.ftueUseCaseSelection)
+        }
+        
         service.settings { [weak self] result in
             guard let self = self else { return }
             
             switch result {
             case .success(let settings):
-                self.identify(with: settings)
+                self.identify(with: settings, and: identityEvent)
                 self.service = nil
             case .failure:
                 MXLog.error("[Analytics] Failed to use analytics settings. Will continue to run without analytics ID.")
@@ -149,13 +157,14 @@ import AnalyticsEvents
     
     /// Identify (pseudonymously) any future events with the ID from the analytics account data settings.
     /// - Parameter settings: The settings to use for identification. The ID must be set *before* calling this method.
-    private func identify(with settings: AnalyticsSettings) {
+    /// - Parameter identityEvent: An identity event that is used to add user properties to the request.
+    private func identify(with settings: AnalyticsSettings, and identityEvent: AnalyticsEvent.Identity?) {
         guard let id = settings.id else {
             MXLog.error("[Analytics] identify(with:) called before an ID has been generated.")
             return
         }
         
-        client.identify(id: id)
+        client.identify(id: id, identity: identityEvent)
         MXLog.debug("[Analytics] Identified.")
         RiotSettings.shared.isIdentifiedForAnalytics = true
     }

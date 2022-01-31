@@ -26,7 +26,8 @@ protocol AnalyticsClientProtocol {
     
     /// Associate the client with an ID. This is persisted until `reset` is called.
     /// - Parameter id: The ID to associate with the user.
-    func identify(id: String)
+    /// - Parameter event: An identity event that contains user specific properties to be sent.
+    func identify(id: String, identity event: AnalyticsEvent.Identity?)
     
     /// Reset all stored properties and any event queues on the client. Note that
     /// the client will remain active, but in a fresh unidentified state.
