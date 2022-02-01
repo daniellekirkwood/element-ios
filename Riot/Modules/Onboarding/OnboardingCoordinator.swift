@@ -221,7 +221,25 @@ final class OnboardingCoordinator: NSObject, OnboardingCoordinatorProtocol {
         if authenticationType == MXKAuthenticationTypeRegister,
            let useCaseResult = useCaseResult,
            let userSession = UserSessionsService.shared.mainUserSession {
-            userSession.properties.store(useCaseResult: useCaseResult)
+            userSession.properties.useCase = useCaseResult.userSessionPropertyValue
+        }
+    }
+}
+
+extension OnboardingUseCaseViewModelResult {
+    /// The result converted into the type stored in the user session.
+    var userSessionPropertyValue: UserSessionProperties.UseCase? {
+        switch self {
+        case .personalMessaging:
+            return .personalMessaging
+        case .workMessaging:
+            return .workMessaging
+        case .communityMessaging:
+            return .communityMessaging
+        case .skipped:
+            return .skipped
+        case .customServer:
+            return nil
         }
     }
 }

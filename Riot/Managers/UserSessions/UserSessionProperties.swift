@@ -72,23 +72,6 @@ class UserSessionProperties: NSObject {
     
     // MARK: - Public
     
-    /// Store the user's use case selection using the Onboarding result.
-    /// - Parameter useCaseResult: An `OnboardingUseCaseViewModelResult` representing the user's selection.
-    func store(useCaseResult: OnboardingUseCaseViewModelResult) {
-        switch useCaseResult {
-        case .personalMessaging:
-            useCase = .personalMessaging
-        case .workMessaging:
-            useCase = .workMessaging
-        case .communityMessaging:
-            useCase = .communityMessaging
-        case .skipped:
-            useCase = .skipped
-        case .customServer:
-            useCase = nil
-        }
-    }
-    
     /// Clear all of the stored properties.
     func delete() {
         dictionary = [:]
